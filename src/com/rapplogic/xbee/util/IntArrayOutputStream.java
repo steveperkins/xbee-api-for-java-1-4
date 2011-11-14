@@ -23,41 +23,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO replace with nio.IntBuffer 
+ * TODO replace with nio.IntBuffer
+ */
+/**
+ * Backported to Java 1.4
+ * 
+ * @author andrew
+ * @author barciszewski@gmail.com backport refactoring
+ * @author perkins.steve@gmail.com backport refactoring
+ * 
  */
 public class IntArrayOutputStream implements IIntArray {
+	// List<Integer>
+	private List intList = new ArrayList();
 
-	private List<Integer> intList = new ArrayList<Integer>();
-	
 	public IntArrayOutputStream() {
 
 	}
-	
-	public void write (int val) {
-		intList.add(val);
-	}
-	
-	public void write(int[] val) {
-        for (int aVal : val) {
-            this.write(aVal);
-        }
-	}
-	
-	public int[] getIntArray() {
-		//int[] integer = (int[]) intList.toArray(new int[0]);
-		// TODO there has got to be a better way -- how to convert list to int[] array?
-		int[] intArr = new int[intList.size()];
-		
-		int i = 0;
-		
-		for (Integer integer : intList) {
-			intArr[i++] = integer;
-		}
-		
-		return intArr;
+
+	public void write(int val) {
+		intList.add(Integer.valueOf(val));
 	}
 
-	public List<Integer> getInternalList() {
+	public void write(int[] arr) {
+		for (int x = 0; x < arr.length; x++) {
+			this.write(arr[x]);
+		}
+	}
+
+	// Why on earth is a utility like this in the interface?
+	public int[] getIntArray() {
+		return IntegerUtil.toArray(intList);
+	}
+
+	// This seems like a bad idea...
+	public List getInternalList() {
 		return intList;
-	}	
+	}
 }

@@ -27,19 +27,21 @@ import com.rapplogic.xbee.util.DoubleByte;
 
 // TODO deprecate all ZNet* classes and replace with ZigBee*
 /**
- * Series 2 XBee. This packet is received when a remote XBee sends a ZNetExplicitTxRequest
+ * Series 2 XBee. This packet is received when a remote XBee sends a
+ * ZNetExplicitTxRequest
  * <p/>
  * Radio must be configured for explicit frames to use this class (AO=1)
  * <p/>
  * API ID: 0x91
  */
 public class ZNetExplicitRxResponse extends ZNetRxResponse {
-	
+
+	private static final long serialVersionUID = -6559407185467903247L;
 	private int sourceEndpoint;
 	private int destinationEndpoint;
 	private DoubleByte clusterId;
 	private DoubleByte profileId;
-	
+
 	public ZNetExplicitRxResponse() {
 		super();
 	}
@@ -75,33 +77,40 @@ public class ZNetExplicitRxResponse extends ZNetRxResponse {
 	public void setProfileId(DoubleByte profileId) {
 		this.profileId = profileId;
 	}
-	
+
 	public void parse(IPacketParser parser) throws IOException {
 		this.parseAddress(parser);
 
 		this.setSourceEndpoint(parser.read("Reading Source Endpoint"));
-		this.setDestinationEndpoint(parser.read("Reading Destination Endpoint"));
+		this
+				.setDestinationEndpoint(parser
+						.read("Reading Destination Endpoint"));
 		DoubleByte clusterId = new DoubleByte();
 		clusterId.setMsb(parser.read("Reading Cluster Id MSB"));
 		clusterId.setLsb(parser.read("Reading Cluster Id LSB"));
 		this.setClusterId(clusterId);
-		
+
 		DoubleByte profileId = new DoubleByte();
 		profileId.setMsb(parser.read("Reading Profile Id MSB"));
 		profileId.setLsb(parser.read("Reading Profile Id LSB"));
 		this.setProfileId(profileId);
-		
+
 		this.parseOption(parser);
-		this.setData(parser.readRemainingBytes());	
+		this.setData(parser.readRemainingBytes());
 	}
 
 	public String toString() {
-		return super.toString() + 
-			",sourceEndpoint=" + ByteUtils.toBase16(this.getSourceEndpoint()) +
-			",destinationEndpoint=" + ByteUtils.toBase16(this.getDestinationEndpoint()) +
-			",clusterId(msb)=" + ByteUtils.toBase16(this.getClusterId().getMsb()) +
-			",clusterId(lsb)=" + ByteUtils.toBase16(this.getClusterId().getLsb()) +
-			",profileId(msb)=" + ByteUtils.toBase16(this.getProfileId().getMsb()) +
-			",profileId(lsb)=" + ByteUtils.toBase16(this.getProfileId().getLsb());
+		return super.toString() + ",sourceEndpoint="
+				+ ByteUtils.toBase16(this.getSourceEndpoint())
+				+ ",destinationEndpoint="
+				+ ByteUtils.toBase16(this.getDestinationEndpoint())
+				+ ",clusterId(msb)="
+				+ ByteUtils.toBase16(this.getClusterId().getMsb())
+				+ ",clusterId(lsb)="
+				+ ByteUtils.toBase16(this.getClusterId().getLsb())
+				+ ",profileId(msb)="
+				+ ByteUtils.toBase16(this.getProfileId().getMsb())
+				+ ",profileId(lsb)="
+				+ ByteUtils.toBase16(this.getProfileId().getLsb());
 	}
 }

@@ -20,9 +20,6 @@
 package com.rapplogic.xbee.api.zigbee;
 
 import java.io.IOException;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.rapplogic.xbee.api.IPacketParser;
 import com.rapplogic.xbee.api.XBeeAddress16;
@@ -30,105 +27,32 @@ import com.rapplogic.xbee.api.XBeeAddress64;
 import com.rapplogic.xbee.api.XBeeResponse;
 import com.rapplogic.xbee.util.DoubleByte;
 
+/**
+ * Backported to Java 1.4
+ * 
+ * @author andrew
+ * @author barciszewski@gmail.com backport refactoring
+ * @author perkins.steve@gmail.com backport refactoring
+ * 
+ */
 public class ZNetNodeIdentificationResponse extends XBeeResponse {
 
-	public enum Option {
-		PACKET_ACKNOWLEDGED (0x01),
-		BROADCAST_PACKET (0x02);
-		
-		private static final Map<Integer,Option> lookup = new HashMap<Integer,Option>();
-		
-		static {
-			for(Option s : EnumSet.allOf(Option.class)) {
-				lookup.put(s.getValue(), s);
-			}
-		}
-		
-		public static Option get(int value) { 
-			return lookup.get(value); 
-		}
-		
-	    private final int value;
-	    
-	    Option(int value) {
-	        this.value = value;
-	    }
+	private static final long serialVersionUID = -5664189661884302647L;
 
-		public int getValue() {
-			return value;
-		}
-	}
-
-	// TODO this is repeated in NodeDiscover
-	public enum DeviceType  {
-		COORDINATOR (0x1),
-		ROUTER (0x2),
-		END_DEVICE (0x3);
-		
-		private static final Map<Integer,DeviceType> lookup = new HashMap<Integer,DeviceType>();
-		
-		static {
-			for(DeviceType s: EnumSet.allOf(DeviceType.class)) {
-				lookup.put(s.getValue(), s);
-			}
-		}
-		
-		public static DeviceType get(int value) { 
-			return lookup.get(value); 
-		}
-		
-	    private final int value;
-	    
-	    DeviceType(int value) {
-	        this.value = value;
-	    }
-
-		public int getValue() {
-			return value;
-		}
-	}
-
-	public enum SourceAction {
-		PUSHBUTTON (0x1),
-		JOINING (0x2);
-
-		private static final Map<Integer,SourceAction> lookup = new HashMap<Integer,SourceAction>();
-		
-		static {
-			for(SourceAction s: EnumSet.allOf(SourceAction.class)) {
-				lookup.put(s.getValue(), s);
-			}
-		}
-		
-		public static SourceAction get(int value) { 
-			return lookup.get(value); 
-		}
-		
-	    private final int value;
-	    
-	    SourceAction(int value) {
-	        this.value = value;
-	    }
-
-		public int getValue() {
-			return value;
-		}
-	}
-	
 	private XBeeAddress64 remoteAddress64;
 	private XBeeAddress16 remoteAddress16;
-	private Option option;
+	private PacketOption option;
 	// TODO Digi WTF why duplicated?? p.70
 	private XBeeAddress64 remoteAddress64_2;
 	private XBeeAddress16 remoteAddress16_2;
-	
+
 	private String nodeIdentifier;
 	private XBeeAddress16 parentAddress;
 	private DeviceType deviceType;
 	private SourceAction sourceAction;
 	private DoubleByte profileId;
 	private DoubleByte mfgId;
-	
+
 	public ZNetNodeIdentificationResponse() {
 
 	}
@@ -149,11 +73,11 @@ public class ZNetNodeIdentificationResponse extends XBeeResponse {
 		this.remoteAddress16 = remoteAddress16;
 	}
 
-	public Option getOption() {
+	public PacketOption getOption() {
 		return option;
 	}
 
-	public void setOption(Option option) {
+	public void setOption(PacketOption option) {
 		this.option = option;
 	}
 
@@ -221,48 +145,47 @@ public class ZNetNodeIdentificationResponse extends XBeeResponse {
 		this.mfgId = mfgId;
 	}
 
-	public void parse(IPacketParser parser) throws IOException {		
+	public void parse(IPacketParser parser) throws IOException {
 		this.setRemoteAddress64(parser.parseAddress64());
 		this.setRemoteAddress16(parser.parseAddress16());
-		
+
 		int option = parser.read("Option");
-		this.setOption(ZNetNodeIdentificationResponse.Option.get(option));		
+		this.setOption(PacketOption.get(option));
 
 		// again with the addresses
 		this.setRemoteAddress64_2(parser.parseAddress64());
 		this.setRemoteAddress16_2(parser.parseAddress16());
-		
+
 		StringBuffer ni = new StringBuffer();
-		
+
 		int ch = 0;
-		
+
 		// NI is terminated with 0
 		while ((ch = parser.read("Node Identifier")) != 0) {
-			ni.append((char)ch);			
+			ni.append((char) ch);
 		}
-		
+
 		this.setNodeIdentifier(ni.toString());
-		this.setParentAddress(parser.parseAddress16());		
-		
+		this.setParentAddress(parser.parseAddress16());
+
 		int deviceType = parser.read("Device Type");
-		
-		this.setDeviceType(ZNetNodeIdentificationResponse.DeviceType.get(deviceType));		
-		
+
+		this.setDeviceType(DeviceType.get(deviceType));
+
 		int sourceAction = parser.read("Source Action");
-		this.setSourceAction(ZNetNodeIdentificationResponse.SourceAction.get(sourceAction));	
-		
+		this.setSourceAction(SourceAction.get(sourceAction));
+
 		DoubleByte profileId = new DoubleByte();
 		profileId.setMsb(parser.read("Profile MSB"));
 		profileId.setLsb(parser.read("Profile LSB"));
 		this.setProfileId(profileId);
-		
+
 		DoubleByte mfgId = new DoubleByte();
 		mfgId.setMsb(parser.read("MFG MSB"));
 		mfgId.setLsb(parser.read("MFG LSB"));
-		this.setMfgId(mfgId);		
+		this.setMfgId(mfgId);
 	}
-	
-	@Override
+
 	public String toString() {
 		return "ZNetNodeIdentificationResponse [deviceType=" + deviceType
 				+ ", mfgId=" + mfgId + ", nodeIdentifier=" + nodeIdentifier
@@ -271,7 +194,6 @@ public class ZNetNodeIdentificationResponse extends XBeeResponse {
 				+ remoteAddress16 + ", remoteAddress16_2=" + remoteAddress16_2
 				+ ", remoteAddress64=" + remoteAddress64
 				+ ", remoteAddress64_2=" + remoteAddress64_2
-				+ ", sourceAction=" + sourceAction + "]" +
-				super.toString();
+				+ ", sourceAction=" + sourceAction + "]" + super.toString();
 	}
 }

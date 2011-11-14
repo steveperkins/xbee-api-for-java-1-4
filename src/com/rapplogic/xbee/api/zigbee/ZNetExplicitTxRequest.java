@@ -19,10 +19,6 @@
 
 package com.rapplogic.xbee.api.zigbee;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.rapplogic.xbee.api.ApiId;
 import com.rapplogic.xbee.api.XBeeAddress16;
 import com.rapplogic.xbee.api.XBeeAddress64;
@@ -31,128 +27,80 @@ import com.rapplogic.xbee.util.DoubleByte;
 import com.rapplogic.xbee.util.IntArrayOutputStream;
 
 /**
- * Series 2 XBee.  Sends a packet to a remote radio.  The remote radio
- * receives the packet as a ZNetExplicitRxResponse packet.
+ * Series 2 XBee. Sends a packet to a remote radio. The remote radio receives
+ * the packet as a ZNetExplicitRxResponse packet.
  * <p/>
  * Radio must be configured for explicit frames to use this class (AO=1)
  * <p/>
  * API ID: 0x11
  * 
+ * Backported to Java 1.4
+ * 
  * @author andrew
- *
+ * @author barciszewski@gmail.com backport refactoring
+ * @author perkins.steve@gmail.com backport refactoring
+ * 
  */
 public class ZNetExplicitTxRequest extends ZNetTxRequest {
-	
-	public enum Endpoint {
-		ZDO_ENDPOINT(0),
-		COMMAND (0xe6), 
-		DATA (0xe8);
-		
-		private static final Map<Integer,Endpoint> lookup = new HashMap<Integer,Endpoint>();
-		
-		static {
-			for(Endpoint s : EnumSet.allOf(Endpoint.class)) {
-				lookup.put(s.getValue(), s);
-			}
-		}
-		
-		public static Endpoint get(int value) { 
-			return lookup.get(value); 
-		}
-		
-	    private final int value;
-	    
-	    Endpoint(int value) {
-	        this.value = value;
-	    }
 
-		public int getValue() {
-			return value;
-		}
-	}
+	private static final long serialVersionUID = -1208466120818907727L;
 
-	public enum ClusterId {
-		TRANSPARENT_SERIAL (Endpoint.DATA, 0x11), 
-		SERIAL_LOOPBACK (Endpoint.DATA, 0x12),
-		IO_SAMPLE (Endpoint.DATA, 0x92),
-		XBEE_SENSOR (Endpoint.DATA, 0x94),
-		NODE_IDENTIFICATION (Endpoint.DATA, 0x95);
-				
-		private static final Map<Integer,ClusterId> lookup = new HashMap<Integer,ClusterId>();
-		
-		static {
-			for(ClusterId s : EnumSet.allOf(ClusterId.class)) {
-				lookup.put(s.getValue(), s);
-			}
-		}
-		
-		public static ClusterId get(int value) { 
-			return lookup.get(value); 
-		}
-		
-	    private final int value;
-	    private final Endpoint endpoint;
-	    
-	    ClusterId(Endpoint endpoint, int value) {
-	    	this.endpoint = endpoint;
-	        this.value = value;
-	    }
-
-		public int getValue() {
-			return value;
-		}
-		
-		public Endpoint getEndpoint() {
-			return this.endpoint;
-		}
-	}
-	
 	// TODO ZDO commands
-	
+
 	private int sourceEndpoint;
 	private int destinationEndpoint;
 	private DoubleByte clusterId;
 	private DoubleByte profileId;
-		
+
 	public final static DoubleByte znetProfileId = new DoubleByte(0xc1, 0x05);
 	public final static DoubleByte zdoProfileId = new DoubleByte(0, 0);
-	
-	public ZNetExplicitTxRequest(int frameId, XBeeAddress64 dest64, XBeeAddress16 dest16, int broadcastRadius, ZNetTxRequest.Option option, int[] payload, 	int sourceEndpoint, int destinationEndpoint, DoubleByte clusterId, DoubleByte profileId) {
+
+	public ZNetExplicitTxRequest(int frameId, XBeeAddress64 dest64,
+			XBeeAddress16 dest16, int broadcastRadius,
+			ZNetTxRequest.Option option, int[] payload, int sourceEndpoint,
+			int destinationEndpoint, DoubleByte clusterId, DoubleByte profileId) {
 		super(frameId, dest64, dest16, broadcastRadius, option, payload);
 		this.sourceEndpoint = sourceEndpoint;
 		this.destinationEndpoint = destinationEndpoint;
 		this.clusterId = clusterId;
 		this.profileId = profileId;
 	}
-	
+
 	/**
 	 * Gets frame data from tx request (super) and inserts necessary bytes
 	 */
 	public int[] getFrameData() {
-		
+
 		// get frame id from tx request
-		IntArrayOutputStream frameData = this.getFrameDataAsIntArrayOutputStream();
-		
+		IntArrayOutputStream frameData = this
+				.getFrameDataAsIntArrayOutputStream();
+
 		// overwrite api id
 		frameData.getInternalList().set(0, this.getApiId().getValue());
-		
+
 		// insert explicit bytes
-		
+
 		// source endpoint
-		frameData.getInternalList().add(12, this.getSourceEndpoint());
+		frameData.getInternalList().add(12,
+				Integer.valueOf(this.getSourceEndpoint()));
 		// dest endpoint
-		frameData.getInternalList().add(13, this.getDestinationEndpoint());
+		frameData.getInternalList().add(13,
+				Integer.valueOf(this.getDestinationEndpoint()));
 		// cluster id msb
-		frameData.getInternalList().add(14, this.getClusterId().getMsb());
+		frameData.getInternalList().add(14,
+				Integer.valueOf(this.getClusterId().getMsb()));
 		// cluster id lsb
-		frameData.getInternalList().add(15, this.getClusterId().getLsb());
+		frameData.getInternalList().add(15,
+				Integer.valueOf(this.getClusterId().getLsb()));
 		// profile id
-		frameData.getInternalList().add(16, this.getProfileId().getMsb());
-		frameData.getInternalList().add(17, this.getProfileId().getLsb());
-		
+		frameData.getInternalList().add(16,
+				Integer.valueOf(this.getProfileId().getMsb()));
+		frameData.getInternalList().add(17,
+				Integer.valueOf(this.getProfileId().getLsb()));
+
 		return frameData.getIntArray();
 	}
-	
+
 	public ApiId getApiId() {
 		return ApiId.ZNET_EXPLICIT_TX_REQUEST;
 	}
@@ -188,14 +136,19 @@ public class ZNetExplicitTxRequest extends ZNetTxRequest {
 	public void setProfileId(DoubleByte profileId) {
 		this.profileId = profileId;
 	}
-	
+
 	public String toString() {
-		return super.toString() + 
-			",sourceEndpoint=" + ByteUtils.toBase16(this.getSourceEndpoint()) +
-			",destinationEndpoint=" + ByteUtils.toBase16(this.getDestinationEndpoint()) +
-			",clusterId(msb)=" + ByteUtils.toBase16(this.getClusterId().getMsb()) +
-			",clusterId(lsb)=" + ByteUtils.toBase16(this.getClusterId().getLsb()) +
-			",profileId(msb)=" + ByteUtils.toBase16(this.getProfileId().getMsb()) +
-			",profileId(lsb)=" + ByteUtils.toBase16(this.getProfileId().getLsb());
+		return super.toString() + ",sourceEndpoint="
+				+ ByteUtils.toBase16(this.getSourceEndpoint())
+				+ ",destinationEndpoint="
+				+ ByteUtils.toBase16(this.getDestinationEndpoint())
+				+ ",clusterId(msb)="
+				+ ByteUtils.toBase16(this.getClusterId().getMsb())
+				+ ",clusterId(lsb)="
+				+ ByteUtils.toBase16(this.getClusterId().getLsb())
+				+ ",profileId(msb)="
+				+ ByteUtils.toBase16(this.getProfileId().getMsb())
+				+ ",profileId(lsb)="
+				+ ByteUtils.toBase16(this.getProfileId().getLsb());
 	}
 }

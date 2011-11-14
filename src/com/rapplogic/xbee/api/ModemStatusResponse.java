@@ -20,60 +20,87 @@
 package com.rapplogic.xbee.api;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.rapplogic.xbee.util.IIntInputStream;
-
 /**
- * RF module status messages are sent from the module in response to specific conditions. 
+ * RF module status messages are sent from the module in response to specific
+ * conditions.
  * <p/>
  * API ID: 0x8a
  * <p/>
+ * Backported to Java 1.4
+ * 
  * @author andrew
- *
+ * @author barciszewski@gmail.com backport refactoring
+ * @author perkins.steve@gmail.com backport refactoring
+ * 
  */
-public class ModemStatusResponse extends XBeeResponse implements NoRequestResponse {
-		
-	public enum Status {
-		HARDWARE_RESET (0),
-		WATCHDOG_TIMER_RESET (1),
-		ASSOCIATED (2),
-		DISASSOCIATED (3),
-		SYNCHRONIZATION_LOST (4),
-		COORDINATOR_REALIGNMENT (5),
-		COORDINATOR_STARTED (6);
-		
-		private static final Map<Integer,Status> lookup = new HashMap<Integer,Status>();
-		
-		static {
-			for(Status s : EnumSet.allOf(Status.class)) {
-				lookup.put(s.getValue(), s);
-			}
-		}
-		
-		public static Status get(int value) { 
-			return lookup.get(value); 
-		}
-		
-	    private final int value;
-	    
-	    Status(int value) {
-	        this.value = value;
-	    }
+public class ModemStatusResponse extends XBeeResponse implements
+		NoRequestResponse {
 
-		public int getValue() {
+	private static final long serialVersionUID = -8537055053136545614L;
+
+	/**
+	 * Downport of the Status enumeration
+	 * 
+	 * @author Steve
+	 * @author Ben
+	 * 
+	 */
+	public static class Status {
+		public static Status HARDWARE_RESET = new Status(0);
+		public static Status WATCHDOG_TIMER_RESET = new Status(1);
+		public static Status ASSOCIATED = new Status(2);
+		public static Status DISASSOCIATED = new Status(3);
+		public static Status SYNCHRONIZATION_LOST = new Status(4);
+		public static Status COORDINATOR_REALIGNMENT = new Status(5);
+		public static Status COORDINATOR_STARTED = new Status(6);
+
+		// Integer,Status
+		private static final Map lookup = createLookup();
+		private final Integer value;
+
+		private Status(int value) {
+			this(Integer.valueOf(value));
+		}
+
+		private Status(Integer value) {
+			this.value = value;
+		}
+
+		public Integer getValue() {
 			return value;
 		}
+
+		public static Status get(int value) {
+			return get(Integer.valueOf(value));
+		}
+
+		public static Status get(Integer value) {
+			return (Status) lookup.get(value);
+		}
+
+		private static Map createLookup() {
+			Map lookup = new HashMap();
+			lookup.put(HARDWARE_RESET.getValue(), HARDWARE_RESET);
+			lookup.put(WATCHDOG_TIMER_RESET.getValue(), WATCHDOG_TIMER_RESET);
+			lookup.put(ASSOCIATED.getValue(), ASSOCIATED);
+			lookup.put(DISASSOCIATED.getValue(), DISASSOCIATED);
+			lookup.put(SYNCHRONIZATION_LOST.getValue(), SYNCHRONIZATION_LOST);
+			lookup.put(COORDINATOR_REALIGNMENT.getValue(),
+					COORDINATOR_REALIGNMENT);
+			lookup.put(COORDINATOR_STARTED.getValue(), COORDINATOR_STARTED);
+			return lookup;
+		}
 	}
-	
+
 	private Status status;
-	
+
 	public ModemStatusResponse() {
 
 	}
-	
+
 	public Status getStatus() {
 		return status;
 	}
@@ -83,9 +110,10 @@ public class ModemStatusResponse extends XBeeResponse implements NoRequestRespon
 	}
 
 	protected void parse(IPacketParser parser) throws IOException {
-		this.setStatus(ModemStatusResponse.Status.get(parser.read("Modem Status")));
+		this.setStatus(ModemStatusResponse.Status.get(parser
+				.read("Modem Status")));
 	}
-	
+
 	public String toString() {
 		return super.toString() + ",status=" + this.status;
 	}
