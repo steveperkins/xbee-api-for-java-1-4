@@ -19,19 +19,21 @@
 
 package com.rapplogic.xbee.api.zigbee;
 
+import com.rapplogic.xbee.api.RemoteAtRequest;
 import com.rapplogic.xbee.api.XBeeAddress16;
 import com.rapplogic.xbee.api.XBeeAddress64;
 import com.rapplogic.xbee.api.XBeeRequest;
-import com.rapplogic.xbee.api.RemoteAtRequest;
 
 /**
  * Uses Remote AT to send a Force Sample (IS) AT command to a remote XBee
  * 
  * @author andrew
- *
+ * 
  */
 public class ZBForceSampleRequest extends RemoteAtRequest {
-		
+
+	private static final long serialVersionUID = -5556592595956235088L;
+
 	/**
 	 * Creates a Force Sample Remote AT request
 	 * 
@@ -39,6 +41,7 @@ public class ZBForceSampleRequest extends RemoteAtRequest {
 	 * @param command
 	 */
 	public ZBForceSampleRequest(XBeeAddress64 dest64) {
-		super(XBeeRequest.DEFAULT_FRAME_ID, dest64, XBeeAddress16.ZNET_BROADCAST, false, "IS", null);
+		super(XBeeRequest.DEFAULT_FRAME_ID, dest64,
+				XBeeAddress16.ZNET_BROADCAST, false, "IS", null);
 	}
 }

@@ -19,44 +19,46 @@
 
 package com.rapplogic.xbee.api;
 
-
 /**
  * Represents a XBee Address.
  * <p/>
+ * 
  * @author andrew
- *
+ * 
  */
 public class HardwareVersion {
 
 	public static class RadioType {
-		static RadioType SERIES1 = new RadioType("Series 1");
-		static RadioType SERIES1_PRO = new RadioType("Series 1 Pro");
-		static RadioType SERIES2 = new RadioType("Series 2");
-		static RadioType SERIES2_PRO = new RadioType("Series 2 Pro");
-		static RadioType SERIES2B_PRO = new RadioType("Series 2B Pro");
-		static RadioType UNKNOWN = new RadioType("Unknown");
-		
+		public static RadioType SERIES1 = new RadioType("Series 1");
+		public static RadioType SERIES1_PRO = new RadioType("Series 1 Pro");
+		public static RadioType SERIES2 = new RadioType("Series 2");
+		public static RadioType SERIES2_PRO = new RadioType("Series 2 Pro");
+		public static RadioType SERIES2B_PRO = new RadioType("Series 2B Pro");
+		public static RadioType UNKNOWN = new RadioType("Unknown");
+
 		private String name;
-		
-		RadioType(String name) {
+
+		private RadioType(String name) {
 			this.name = name;
 		}
-		
+
 		public String toString() {
 			return name;
 		}
 	}
-	
-	public static RadioType parse(AtCommandResponse response) throws XBeeException {
-		
+
+	public static RadioType parse(AtCommandResponse response)
+			throws XBeeException {
+
 		if (!response.getCommand().equals("HV")) {
-			throw new IllegalArgumentException("This is only applicable to the HV command");
+			throw new IllegalArgumentException(
+					"This is only applicable to the HV command");
 		}
-		
+
 		if (!response.isOk()) {
 			throw new XBeeException("Attempt to query HV parameter failed");
 		}
-		
+
 		switch (response.getValue()[0]) {
 		case 0x17:
 			return RadioType.SERIES1;

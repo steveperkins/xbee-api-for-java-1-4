@@ -19,53 +19,87 @@
 
 package com.rapplogic.xbee.api.zigbee;
 
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.rapplogic.xbee.api.AtCommandResponse;
 
-// TODO create for wpan
-public enum AssociationStatus {
-	SUCCESS (0, "Successful completion - Coordinator started or Router/End Device found and joined with a parent."),
-	NO_PAN (0x21, "Scan found no PANs"),
-	NO_VALID_PAN (0x22, "Scan found no valid PANs based on current SC and ID settings"),
-	NJ_EXPIRED (0x23, "Valid Coordinator or Routers found, but they are not allowing joining (NJ expired)"),
-	NJ_FAILED (0x27, "Node Joining attempt failed (typically due to incompatible security settings)"),
-	COORDINATOR_START_FAILED (0x2a, "Coordinator Start attempt failed"),
-	SCANNING_FOR_PARENT (0xff, "Scanning for a Parent"),
-	EXISTING_COORDINATOR_CHECK (0x2b, "Checking for an existing coordinator");
-	
-	private static final Map<Integer,AssociationStatus> lookup = new HashMap<Integer,AssociationStatus>();
-	
-	static {
-		for(AssociationStatus s : EnumSet.allOf(AssociationStatus.class)) {
-			lookup.put(s.getValue(), s);
-		}
-	}
-	
-	public static AssociationStatus get(int value) { 
-		return lookup.get(value); 
-	}
-	
-	public static AssociationStatus get(AtCommandResponse response) { 
-		return AssociationStatus.get(response.getValue()[0]); 
-	}
-	
-    private final int value;
-    private final String description;
-    
-    AssociationStatus(int value, String description) {
-        this.value = value;
-        this.description = description;
-        
-    }
+/**
+ * Downport of the AssociationStatus enumeration
+ * 
+ * @author barciszewski@gmail.com
+ * @author perkins.steve@gmail.com
+ * 
+ */
+public class AssociationStatus {
 
-	public int getValue() {
+	static AssociationStatus SUCCESS = new AssociationStatus(
+			0,
+			"Successful completion - Coordinator started or Router/End Device found and joined with a parent.");
+	static AssociationStatus NO_PAN = new AssociationStatus(0x21,
+			"Scan found no PANs");
+	static AssociationStatus NO_VALID_PAN = new AssociationStatus(0x22,
+			"Scan found no valid PANs based on current SC and ID settings");
+	static AssociationStatus NJ_EXPIRED = new AssociationStatus(
+			0x23,
+			"Valid Coordinator or Routers found, but they are not allowing joining (NJ expired)");
+	static AssociationStatus NJ_FAILED = new AssociationStatus(0x27,
+			"Node Joining attempt failed (typically due to incompatible security settings)");
+	static AssociationStatus COORDINATOR_START_FAILED = new AssociationStatus(
+			0x2a, "Coordinator Start attempt failed");
+	static AssociationStatus SCANNING_FOR_PARENT = new AssociationStatus(0xff,
+			"Scanning for a Parent");
+	static AssociationStatus EXISTING_COORDINATOR_CHECK = new AssociationStatus(
+			0x2b, "Checking for an existing coordinator");
+
+	// Integer,AssociationStatus
+	private static final Map lookup = createLookup();
+
+	private final Integer value;
+	private final String description;
+
+	private AssociationStatus(int value, String description) {
+		this(Integer.valueOf(value), description);
+	}
+
+	private AssociationStatus(Integer value, String description) {
+		this.value = value;
+		this.description = description;
+	}
+
+	public Integer getValue() {
 		return value;
 	}
 
 	public String getDescription() {
 		return description;
 	}
+
+	public static AssociationStatus get(int value) {
+		return get(Integer.valueOf(value));
+	}
+
+	public static AssociationStatus get(Integer value) {
+		return (AssociationStatus) lookup.get(value);
+	}
+
+	public static AssociationStatus get(AtCommandResponse response) {
+		return AssociationStatus.get(response.getValue()[0]);
+	}
+
+	private static Map createLookup() {
+		Map lookup = new HashMap();
+		lookup.put(SUCCESS.getValue(), SUCCESS);
+		lookup.put(NO_PAN.getValue(), NO_PAN);
+		lookup.put(NO_VALID_PAN.getValue(), NO_VALID_PAN);
+		lookup.put(NJ_EXPIRED.getValue(), NJ_EXPIRED);
+		lookup.put(NJ_FAILED.getValue(), NJ_FAILED);
+		lookup.put(COORDINATOR_START_FAILED.getValue(),
+				COORDINATOR_START_FAILED);
+		lookup.put(SCANNING_FOR_PARENT.getValue(), SCANNING_FOR_PARENT);
+		lookup.put(EXISTING_COORDINATOR_CHECK.getValue(),
+				EXISTING_COORDINATOR_CHECK);
+		return lookup;
+	}
+
 }

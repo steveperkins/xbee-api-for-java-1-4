@@ -20,94 +20,32 @@
 package com.rapplogic.xbee.api.zigbee;
 
 import java.io.IOException;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.rapplogic.xbee.api.IPacketParser;
 import com.rapplogic.xbee.api.XBeeAddress16;
 import com.rapplogic.xbee.api.XBeeFrameIdResponse;
 
 /**
- * Series 2 XBee.  This is sent out the UART of the transmitting XBee immediately following
- * a Transmit packet.  Indicates if the Transmit packet (ZNetTxRequest)
+ * Series 2 XBee. This is sent out the UART of the transmitting XBee immediately
+ * following a Transmit packet. Indicates if the Transmit packet (ZNetTxRequest)
  * was successful.
  * <p/>
  * API ID: 0x8b
  * <p/>
+ * Backported to Java 1.4
+ * 
  * @author andrew
+ * @author barciszewski@gmail.com backport refactoring
+ * @author perkins.steve@gmail.com backport refactoring
  */
 public class ZNetTxStatusResponse extends XBeeFrameIdResponse {
-	
-	public enum DeliveryStatus {
-		SUCCESS (0),
-		CCA_FAILURE (0x02),
-		INVALID_DESTINATION_ENDPOINT (0x15),
-		NETWORK_ACK_FAILURE (0x21),
-		NOT_JOINED_TO_NETWORK (0x22),
-		SELF_ADDRESSED (0x23),
-		ADDRESS_NOT_FOUND (0x24),
-		ROUTE_NOT_FOUND (0x25),
-		PAYLOAD_TOO_LARGE(0x74); // ZB Pro firmware only
 
-		private static final Map<Integer,DeliveryStatus> lookup = new HashMap<Integer,DeliveryStatus>();
-		
-		static {
-			for(DeliveryStatus s : EnumSet.allOf(DeliveryStatus.class)) {
-				lookup.put(s.getValue(), s);
-			}
-		}
-		
-	    private final int value;
-	    
-	    DeliveryStatus(int value) {
-	        this.value = value;
-	    }
-
-		public static DeliveryStatus get(int value) { 
-			return lookup.get(value); 
-		}
-		
-		public int getValue() {
-			return value;
-		}
-	}
-
-	public enum DiscoveryStatus {
-		NO_DISCOVERY (0),
-		ADDRESS_DISCOVERY (1),
-		ROUTE_DISCOVERY (2),
-		ADDRESS_AND_ROUTE_DISCOVERY(3);
-
-		private static final Map<Integer,DiscoveryStatus> lookup = new HashMap<Integer,DiscoveryStatus>();
-		
-		static {
-			for(DiscoveryStatus s : EnumSet.allOf(DiscoveryStatus.class)) {
-				lookup.put(s.getValue(), s);
-			}
-		}
-		
-	    private final int value;
-	    
-	    DiscoveryStatus(int value) {
-	        this.value = value;
-	    }
-
-		public static DiscoveryStatus get(int value) { 
-			return lookup.get(value); 
-		}
-		
-		public int getValue() {
-			return value;
-		}
-	}
-
+	private static final long serialVersionUID = 94591441791742135L;
 	private XBeeAddress16 remoteAddress16;
 	private int retryCount;
 	private DeliveryStatus deliveryStatus;
 	private DiscoveryStatus discoveryStatus;
-	
-	
+
 	public ZNetTxStatusResponse() {
 
 	}
@@ -116,16 +54,13 @@ public class ZNetTxStatusResponse extends XBeeFrameIdResponse {
 		return remoteAddress16;
 	}
 
-
 	public void setRemoteAddress16(XBeeAddress16 remoteAddress) {
 		this.remoteAddress16 = remoteAddress;
 	}
 
-
 	public int getRetryCount() {
 		return retryCount;
 	}
-
 
 	public void setRetryCount(int retryCount) {
 		this.retryCount = retryCount;
@@ -146,7 +81,7 @@ public class ZNetTxStatusResponse extends XBeeFrameIdResponse {
 	public void setDiscoveryStatus(DiscoveryStatus discoveryStatus) {
 		this.discoveryStatus = discoveryStatus;
 	}
-	
+
 	/**
 	 * Returns true if the delivery status is SUCCESS
 	 * 
@@ -155,25 +90,24 @@ public class ZNetTxStatusResponse extends XBeeFrameIdResponse {
 	public boolean isSuccess() {
 		return this.getDeliveryStatus() == DeliveryStatus.SUCCESS;
 	}
-	
-	public void parse(IPacketParser parser) throws IOException {		
+
+	public void parse(IPacketParser parser) throws IOException {
 		this.setFrameId(parser.read("ZNet Tx Status Frame Id"));
 
 		this.setRemoteAddress16(parser.parseAddress16());
 		this.setRetryCount(parser.read("ZNet Tx Status Tx Count"));
-		
+
 		int deliveryStatus = parser.read("ZNet Tx Status Delivery Status");
-		this.setDeliveryStatus(ZNetTxStatusResponse.DeliveryStatus.get(deliveryStatus));
-		
+		this.setDeliveryStatus(DeliveryStatus.get(deliveryStatus));
+
 		int discoveryStatus = parser.read("ZNet Tx Status Discovery Status");
-		this.setDiscoveryStatus(ZNetTxStatusResponse.DiscoveryStatus.get(discoveryStatus));
+		this.setDiscoveryStatus(DiscoveryStatus.get(discoveryStatus));
 	}
-	
+
 	public String toString() {
-		return super.toString() + 
-		",remoteAddress16=" + this.remoteAddress16 +
-		",retryCount=" + this.retryCount +
-		",deliveryStatus=" + this.deliveryStatus + 
-		",discoveryStatus=" + this.discoveryStatus;
+		return super.toString() + ",remoteAddress16=" + this.remoteAddress16
+				+ ",retryCount=" + this.retryCount + ",deliveryStatus="
+				+ this.deliveryStatus + ",discoveryStatus="
+				+ this.discoveryStatus;
 	}
 }
