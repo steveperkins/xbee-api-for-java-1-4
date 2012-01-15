@@ -24,11 +24,13 @@ import com.rapplogic.xbee.util.ByteUtils;
 /**
  * Represents all XBee responses that contain a frame id
  * <p/>
+ * 
  * @author andrew
- *
+ * 
  */
 public abstract class XBeeFrameIdResponse extends XBeeResponse {
-	
+
+	private static final long serialVersionUID = -1719082648663672811L;
 	private int frameId;
 
 	public int getFrameId() {
@@ -38,8 +40,9 @@ public abstract class XBeeFrameIdResponse extends XBeeResponse {
 	public void setFrameId(int frameId) {
 		this.frameId = frameId;
 	}
-	
+
 	public String toString() {
-		return super.toString() + ",frameId=" + ByteUtils.toBase16(this.frameId);
+		return super.toString() + ",frameId="
+				+ ByteUtils.toBase16(this.frameId);
 	}
 }

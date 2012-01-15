@@ -26,55 +26,59 @@ import com.rapplogic.xbee.api.ApiId;
 import com.rapplogic.xbee.api.PacketListener;
 import com.rapplogic.xbee.api.XBee;
 import com.rapplogic.xbee.api.XBeeResponse;
-import com.rapplogic.xbee.api.wpan.IoSample;
-import com.rapplogic.xbee.api.wpan.RxResponseIoSample;
 import com.rapplogic.xbee.api.zigbee.ZNetRxIoSampleResponse;
 
 /**
- * Series 2 XBees -- Example of receiving I/O samples.  To configure your radio for this example, connect 
- * your end device to your serial connection and run the configureIOSamples() method
- * in ZNetApiAtTest.
- *  
+ * Series 2 XBees -- Example of receiving I/O samples. To configure your radio
+ * for this example, connect your end device to your serial connection and run
+ * the configureIOSamples() method in ZNetApiAtTest.
+ * 
  * @author andrew
- *
+ * 
  */
 public class ZNetIoSampleExample implements PacketListener {
 
-	private final static Logger log = Logger.getLogger(ZNetIoSampleExample.class);
-	
-	private ZNetIoSampleExample() throws Exception {
-		XBee xbee = new XBee();		
+	private final static Logger log = Logger
+			.getLogger(ZNetIoSampleExample.class);
 
-		try {			
+	private ZNetIoSampleExample() throws Exception {
+		XBee xbee = new XBee();
+
+		try {
 			// replace with the com port of your XBee coordinator
 			xbee.open("/dev/tty.usbserial-A6005v5M", 9600);
 			xbee.addPacketListener(this);
-			
+
 			// wait forever
-			synchronized(this) { this.wait(); }
+			synchronized (this) {
+				this.wait();
+			}
 		} finally {
 			xbee.close();
 		}
 	}
-	
+
 	/**
 	 * Called by XBee API thread when a packet is received
 	 */
 	public void processResponse(XBeeResponse response) {
-		// This is a I/O sample response.  You will only get this is you are connected to a Coordinator that is configured to
+		// This is a I/O sample response. You will only get this is you are
+		// connected to a Coordinator that is configured to
 		// receive I/O samples from a remote XBee.
-		
+
 		if (response.getApiId() == ApiId.ZNET_IO_SAMPLE_RESPONSE) {
 			ZNetRxIoSampleResponse ioSample = (ZNetRxIoSampleResponse) response;
-			
-			log.debug("received i/o sample packet.  contains analog is " + ioSample.containsAnalog() + ", contains digital is " + ioSample.containsDigital());
-			
+
+			log.debug("received i/o sample packet.  contains analog is "
+					+ ioSample.containsAnalog() + ", contains digital is "
+					+ ioSample.containsDigital());
+
 			// check the value of the input pins
 			log.debug("pin 20 (DO) digital is " + ioSample.isD0On());
 			log.debug("pin 19 (D1) analog is " + ioSample.getAnalog1());
 		}
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 		// init log4j
 		PropertyConfigurator.configure("log4j.properties");

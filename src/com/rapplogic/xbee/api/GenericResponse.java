@@ -24,17 +24,19 @@ import java.io.IOException;
 /**
  * Container for unknown response
  * <p/>
+ * 
  * @author andrew
- *
+ * 
  */
 public class GenericResponse extends XBeeResponse {
-		
+
+	private static final long serialVersionUID = -4460804659208803948L;
 	private int genericApiId;
 
 	public GenericResponse() {
 
 	}
-	
+
 	public int getGenericApiId() {
 		return genericApiId;
 	}
@@ -42,11 +44,12 @@ public class GenericResponse extends XBeeResponse {
 	public void setGenericApiId(int genericApiId) {
 		this.genericApiId = genericApiId;
 	}
-	
+
 	public void parse(IPacketParser parser) throws IOException {
-		//eat packet bytes -- they will be save to bytearray and stored in response
+		// eat packet bytes -- they will be save to bytearray and stored in
+		// response
 		parser.readRemainingBytes();
 		// TODO gotta save it because it isn't know to the enum apiId won't
-		this.setGenericApiId(parser.getIntApiId());		
+		this.setGenericApiId(parser.getIntApiId());
 	}
 }

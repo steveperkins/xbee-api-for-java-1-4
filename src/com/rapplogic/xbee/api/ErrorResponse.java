@@ -20,18 +20,19 @@
 package com.rapplogic.xbee.api;
 
 /**
- * Represents a Java error during packet parsing.
- * This is the only class that extends XBeeResponse and does not map
- * to a XBee API ID
+ * Represents a Java error during packet parsing. This is the only class that
+ * extends XBeeResponse and does not map to a XBee API ID
  * <p/>
+ * 
  * @author andrew
- *
+ * 
  */
 public class ErrorResponse extends XBeeResponse {
 
+	private static final long serialVersionUID = 8103651351769538022L;
 	private String errorMsg;
 	private Exception exception;
-	
+
 	public ErrorResponse() {
 		super();
 		this.setApiId(ApiId.ERROR_RESPONSE);
@@ -50,7 +51,7 @@ public class ErrorResponse extends XBeeResponse {
 	public void setErrorMsg(String errorMsg) {
 		this.errorMsg = errorMsg;
 	}
-	
+
 	public Exception getException() {
 		return exception;
 	}
@@ -62,8 +63,9 @@ public class ErrorResponse extends XBeeResponse {
 	public void parse(IPacketParser parser) {
 		// nothing to do
 	}
-	
+
 	public String toString() {
-		return super.toString() + ",errorMsg=" + this.errorMsg + ",exception=" + this.exception;
+		return super.toString() + ",errorMsg=" + this.errorMsg + ",exception="
+				+ this.exception;
 	}
 }

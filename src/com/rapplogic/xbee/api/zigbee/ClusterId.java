@@ -7,22 +7,22 @@ import java.util.Map;
  * Downport of the ClusterId enumeration
  * 
  * @author andrew
- * @author barciszewski@gmail.com
- * @author perkins.steve@gmail.com
+ * @author barciszewski@gmail.com Downport to Java 1.4
+ * @author perkins.steve@gmail.com Downport to Java 1.4
  * 
  */
 public class ClusterId {
 
-	static ClusterId TRANSPARENT_SERIAL = new ClusterId(Endpoint.DATA, Integer
-			.valueOf(0x11));
-	static ClusterId SERIAL_LOOPBACK = new ClusterId(Endpoint.DATA, Integer
-			.valueOf(0x12));
-	static ClusterId IO_SAMPLE = new ClusterId(Endpoint.DATA, Integer
+	public static ClusterId TRANSPARENT_SERIAL = new ClusterId(Endpoint.DATA,
+			Integer.valueOf(0x11));
+	public static ClusterId SERIAL_LOOPBACK = new ClusterId(Endpoint.DATA,
+			Integer.valueOf(0x12));
+	public static ClusterId IO_SAMPLE = new ClusterId(Endpoint.DATA, Integer
 			.valueOf(0x92));
-	static ClusterId XBEE_SENSOR = new ClusterId(Endpoint.DATA, Integer
+	public static ClusterId XBEE_SENSOR = new ClusterId(Endpoint.DATA, Integer
 			.valueOf(0x94));
-	static ClusterId NODE_IDENTIFICATION = new ClusterId(Endpoint.DATA, Integer
-			.valueOf(0x95));
+	public static ClusterId NODE_IDENTIFICATION = new ClusterId(Endpoint.DATA,
+			Integer.valueOf(0x95));
 	// Integer,ClusterId
 	private static final Map lookup = createLookup();
 

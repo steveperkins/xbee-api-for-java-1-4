@@ -25,9 +25,10 @@ import com.rapplogic.xbee.api.IPacketParser;
 import com.rapplogic.xbee.util.ByteUtils;
 
 public class RxResponse extends RxBaseResponse {
-	
+
+	private static final long serialVersionUID = -221176512562200634L;
 	private int[] data;
-	
+
 	public RxResponse() {
 
 	}
@@ -40,21 +41,21 @@ public class RxResponse extends RxBaseResponse {
 		this.data = data;
 	}
 
-	public void parse(IPacketParser parser) throws IOException {		
-		int[] payload = new int[parser.getLength().getLength() - parser.getFrameDataBytesRead()];
-		
+	public void parse(IPacketParser parser) throws IOException {
+		int[] payload = new int[parser.getLength().getLength()
+				- parser.getFrameDataBytesRead()];
+
 		int bytesRead = parser.getFrameDataBytesRead();
-		
+
 		for (int i = 0; i < parser.getLength().getLength() - bytesRead; i++) {
 			payload[i] = parser.read("Payload byte " + i);
-			//log.debug("rx data payload [" + i + "] " + payload[i]);
-		}				
-		
-		this.setData(payload);	
+			// log.debug("rx data payload [" + i + "] " + payload[i]);
+		}
+
+		this.setData(payload);
 	}
-	
+
 	public String toString() {
-		return super.toString() +
-			",data=" + ByteUtils.toBase16(this.data);
-	}	
+		return super.toString() + ",data=" + ByteUtils.toBase16(this.data);
+	}
 }

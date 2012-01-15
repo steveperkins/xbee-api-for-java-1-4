@@ -25,21 +25,23 @@ import com.rapplogic.xbee.api.IPacketParser;
 import com.rapplogic.xbee.api.XBeeAddress;
 import com.rapplogic.xbee.api.XBeeResponse;
 import com.rapplogic.xbee.util.ByteUtils;
-import com.rapplogic.xbee.util.IIntInputStream;
 
 /**
- * Series 1 XBee.  Common elements of 16 and 64 bit Address Receive packets
+ * Series 1 XBee. Common elements of 16 and 64 bit Address Receive packets
  * <p/>
+ * 
  * @author andrew
- *
+ * 
  */
 public abstract class RxBaseResponse extends XBeeResponse {
 
+	private static final long serialVersionUID = 4610077108257181555L;
+
 	private XBeeAddress sourceAddress;
-	
+
 	private int rssi;
 	private int options;
-	
+
 	public RxBaseResponse() {
 
 	}
@@ -59,42 +61,44 @@ public abstract class RxBaseResponse extends XBeeResponse {
 	public void setOptions(int options) {
 		this.options = options;
 	}
-	
+
 	public boolean isAddressBroadcast() {
 		return ByteUtils.getBit(options, 2);
 	}
-	
+
 	public boolean isPanBroadcast() {
 		return ByteUtils.getBit(options, 3);
 	}
 
 	/**
-	 * Returns either a XBeeAddress16 or XBeeAddress64
-	 * depending on if the packet is configured for 16 or 64 bit addressing.
+	 * Returns either a XBeeAddress16 or XBeeAddress64 depending on if the
+	 * packet is configured for 16 or 64 bit addressing.
 	 * 
 	 * @return
 	 */
 	public XBeeAddress getSourceAddress() {
 		return sourceAddress;
 	}
-	
+
 	public void setSourceAddress(XBeeAddress sourceAddress) {
 		this.sourceAddress = sourceAddress;
 	}
-	
+
 	protected void parseBase(IPacketParser parser) throws IOException {
 		int rssi = parser.read("RSSI");
-		
+
 		// rssi is a negative dbm value
 		this.setRssi(-rssi);
-		
+
 		int options = parser.read("Options");
-		
+
 		this.setOptions(options);
 	}
 
 	public String toString() {
-		return super.toString() + ",sourceAddress=" + this.getSourceAddress() + ",rssi=" + this.getRssi() + ",options=" + this.getOptions() +
-			",isAddressBroadcast=" + this.isAddressBroadcast() + ",isPanBroadcast=" + this.isPanBroadcast();
+		return super.toString() + ",sourceAddress=" + this.getSourceAddress()
+				+ ",rssi=" + this.getRssi() + ",options=" + this.getOptions()
+				+ ",isAddressBroadcast=" + this.isAddressBroadcast()
+				+ ",isPanBroadcast=" + this.isPanBroadcast();
 	}
 }
