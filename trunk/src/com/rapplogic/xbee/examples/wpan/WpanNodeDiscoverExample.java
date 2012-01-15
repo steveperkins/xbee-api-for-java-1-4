@@ -33,61 +33,76 @@ import com.rapplogic.xbee.api.XBeeResponse;
 import com.rapplogic.xbee.api.wpan.WpanNodeDiscover;
 import com.rapplogic.xbee.util.ByteUtils;
 
-/** 
- * Example of performing a node discover for Series 1 XBees.
- * You must connect to the coordinator to run this example and
- * have one or more end devices that are associated.
+/**
+ * Example of performing a node discover for Series 1 XBees. You must connect to
+ * the coordinator to run this example and have one or more end devices that are
+ * associated.
  * 
  * @author andrew
- *
+ * @author barciszewski@gmail.com backport refactoring
+ * @author perkins.steve@gmail.com backport refactoring
+ * 
  */
 public class WpanNodeDiscoverExample {
 
-	private final static Logger log = Logger.getLogger(WpanNodeDiscoverExample.class);
-	
+	private final static Logger log = Logger
+			.getLogger(WpanNodeDiscoverExample.class);
+
 	private XBee xbee = new XBee();
-	
+
 	public WpanNodeDiscoverExample() throws XBeeException, InterruptedException {
-		
+
 		try {
 			// my coordinator com/baud
 			xbee.open("/dev/tty.usbserial-A4004Rim", 9600);
-			
+
 			// get the Node discovery timeout
 			xbee.sendAsynchronous(new AtCommand("NT"));
-			AtCommandResponse nodeTimeout = (AtCommandResponse) xbee.getResponse();
-			
+			AtCommandResponse nodeTimeout = (AtCommandResponse) xbee
+					.getResponse();
+
 			// default is 2.5 seconds for series 1
-			int nodeDiscoveryTimeout = ByteUtils.convertMultiByteToInt(nodeTimeout.getValue()) * 100;			
-			log.info("Node discovery timeout is " + nodeDiscoveryTimeout + " milliseconds");
-			
+			int nodeDiscoveryTimeout = ByteUtils
+					.convertMultiByteToInt(nodeTimeout.getValue()) * 100;
+			log.info("Node discovery timeout is " + nodeDiscoveryTimeout
+					+ " milliseconds");
+
 			xbee.sendAsynchronous(new AtCommand("ND"));
 
-			// collect responses up to the timeout or until the terminating response is received, whichever occurs first
-			List<? extends XBeeResponse> responses = xbee.collectResponses(10000, new CollectTerminator() {
-				public boolean stop(XBeeResponse response) {
-					if (response instanceof AtCommandResponse) {
-						AtCommandResponse at = (AtCommandResponse) response;
-						if (at.getCommand().equals("ND") && at.getValue() != null && at.getValue().length == 0) {
-							log.debug("Found terminating response");
-							return true;
-						}							
-					}
-					return false;
-				}
-			});
-			
-			//TODO check for terminating node
-			
-			log.info("Time is up!  You should have heard back from all nodes by now.  If not make sure all nodes are associated and/or try increasing the node timeout (NT)");
-			
-			for (XBeeResponse response : responses) {
+			// collect responses up to the timeout or until the terminating
+			// response is received, whichever occurs first
+			List responses = xbee.collectResponses(10000,
+					new CollectTerminator() {
+						public boolean stop(XBeeResponse response) {
+							if (response instanceof AtCommandResponse) {
+								AtCommandResponse at = (AtCommandResponse) response;
+								if (at.getCommand().equals("ND")
+										&& at.getValue() != null
+										&& at.getValue().length == 0) {
+									log.debug("Found terminating response");
+									return true;
+								}
+							}
+							return false;
+						}
+					});
+
+			// TODO check for terminating node
+
+			log
+					.info("Time is up!  You should have heard back from all nodes by now.  If not make sure all nodes are associated and/or try increasing the node timeout (NT)");
+
+			for (int x = 0; x < responses.size(); x++) {
+				XBeeResponse response = (XBeeResponse) responses.get(x);
 				if (response instanceof AtCommandResponse) {
 					AtCommandResponse atResponse = (AtCommandResponse) response;
-					
-					if (atResponse.getCommand().equals("ND") && atResponse.getValue() != null && atResponse.getValue().length > 0) {
-						WpanNodeDiscover nd = WpanNodeDiscover.parse((AtCommandResponse)response);
-						log.info("Node Discover is " + nd);							
+
+					if (atResponse.getCommand().equals("ND")
+							&& atResponse.getValue() != null
+							&& atResponse.getValue().length > 0) {
+						WpanNodeDiscover nd = WpanNodeDiscover
+								.parse((AtCommandResponse) response);
+						log.info("Node Discover is " + nd);
 					}
 				}
 			}
@@ -95,8 +110,9 @@ public class WpanNodeDiscoverExample {
 			xbee.close();
 		}
 	}
-	
-	public static void main(String[] args) throws XBeeException, InterruptedException {
+
+	public static void main(String[] args) throws XBeeException,
+			InterruptedException {
 		PropertyConfigurator.configure("log4j.properties");
 		new WpanNodeDiscoverExample();
 	}

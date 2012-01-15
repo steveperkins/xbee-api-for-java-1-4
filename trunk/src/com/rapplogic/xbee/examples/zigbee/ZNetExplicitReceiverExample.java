@@ -25,38 +25,41 @@ import org.apache.log4j.PropertyConfigurator;
 import com.rapplogic.xbee.api.ApiId;
 import com.rapplogic.xbee.api.XBee;
 import com.rapplogic.xbee.api.XBeeResponse;
-import com.rapplogic.xbee.api.zigbee.ZNetExplicitRxResponse;
 
 /**
  * Set AO=1 for to enable explicit frames for this example
  * 
  * @author andrew
- *
+ * 
  */
 public class ZNetExplicitReceiverExample {
 
-	private final static Logger log = Logger.getLogger(ZNetExplicitReceiverExample.class);
-	
-	private ZNetExplicitReceiverExample() throws Exception {
-		XBee xbee = new XBee();		
+	private final static Logger log = Logger
+			.getLogger(ZNetExplicitReceiverExample.class);
 
-		try {			
+	private ZNetExplicitReceiverExample() throws Exception {
+		XBee xbee = new XBee();
+
+		try {
 			// replace with the com port or your receiving XBee
 			// this is the com port of my end device on my mac
 			xbee.open("/dev/tty.usbserial-A6005uRz", 9600);
-			
+
 			while (true) {
 
 				try {
 					// we wait here until a packet is received.
 					XBeeResponse response = xbee.getResponse();
-					
+
 					if (response.getApiId() == ApiId.ZNET_EXPLICIT_RX_RESPONSE) {
-						ZNetExplicitRxResponse rx = (ZNetExplicitRxResponse) response;
-					
-						log.info("received explicit packet response " + response.toString());
+						// ZNetExplicitRxResponse rx = (ZNetExplicitRxResponse)
+						// response;
+
+						log.info("received explicit packet response "
+								+ response.toString());
 					} else {
-						log.debug("received unexpected packet " + response.toString());
+						log.debug("received unexpected packet "
+								+ response.toString());
 					}
 				} catch (Exception e) {
 					log.error(e);

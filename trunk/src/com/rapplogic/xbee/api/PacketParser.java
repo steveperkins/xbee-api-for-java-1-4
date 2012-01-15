@@ -27,6 +27,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.rapplogic.xbee.api.wpan.RxResponse16;
+import com.rapplogic.xbee.api.wpan.RxResponse64;
+import com.rapplogic.xbee.api.wpan.RxResponseIoSample;
+import com.rapplogic.xbee.api.wpan.TxStatusResponse;
 import com.rapplogic.xbee.api.zigbee.ZNetExplicitRxResponse;
 import com.rapplogic.xbee.api.zigbee.ZNetNodeIdentificationResponse;
 import com.rapplogic.xbee.api.zigbee.ZNetRxIoSampleResponse;

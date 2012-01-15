@@ -32,133 +32,146 @@ import com.rapplogic.xbee.util.IIntInputStream;
 /**
  * Series 1 XBee. Represents an I/O sample
  * <p/>
- * See http://code.google.com/p/xbee-api/wiki/XBeePins for information on configuring
- * the XBee for digital/analog inputs.
+ * See http://code.google.com/p/xbee-api/wiki/XBeePins for information on
+ * configuring the XBee for digital/analog inputs.
  * <p/>
  * API ID: 64-bit 0x82, 16-bit: 0x83
  * <p/>
+ * 
  * @author andrew
- *
+ * 
  */
-public class RxResponseIoSample extends RxBaseResponse implements NoRequestResponse {
-	
-	private final static Logger log = Logger.getLogger(RxResponseIoSample.class);
-	
-	public final static int ADC_CHANNEL1 = 0x7e; //01111110
-	public final static int DIO_CHANNEL1 = 0x1; //00000001
-	
+public class RxResponseIoSample extends RxBaseResponse implements
+		NoRequestResponse {
+
+	private static final long serialVersionUID = -4869169502908706641L;
+
+	private final static Logger log = Logger
+			.getLogger(RxResponseIoSample.class);
+
+	public final static int ADC_CHANNEL1 = 0x7e; // 01111110
+	public final static int DIO_CHANNEL1 = 0x1; // 00000001
+
 	private IoSample[] samples;
-	
+
 	private int channelIndicator1;
 	private int channelIndicator2;
 
 	public RxResponseIoSample() {
-		
+
 	}
 
 	public void parse(IPacketParser parser) throws IOException {
 
 		if (parser.getApiId() == ApiId.RX_16_IO_RESPONSE) {
-			this.setSourceAddress(parser.parseAddress16());	
+			this.setSourceAddress(parser.parseAddress16());
 		} else {
 			this.setSourceAddress(parser.parseAddress64());
-		}	
-		
+		}
+
 		super.parseBase(parser);
 
 		log.debug("this is a I/O sample!");
 		// first byte is # of samples
 		int sampleSize = parser.read("# I/O Samples");
-		
+
 		// create i/o samples array
 		this.setSamples(new IoSample[sampleSize]);
-		
+
 		// channel indicator 1
 		this.setChannelIndicator1(parser.read("Channel Indicator 1"));
-		
-		log.debug("channel indicator 1 is " + ByteUtils.formatByte(this.getChannelIndicator1()));
-		
+
+		log.debug("channel indicator 1 is "
+				+ ByteUtils.formatByte(this.getChannelIndicator1()));
+
 		// channel indicator 2 (dio)
 		this.setChannelIndicator2(parser.read("Channel Indicator 2"));
-		
-		log.debug("channel indicator 2 is " + ByteUtils.formatByte(this.getChannelIndicator2()));	
-		
+
+		log.debug("channel indicator 2 is "
+				+ ByteUtils.formatByte(this.getChannelIndicator2()));
+
 		// collect each sample
 		for (int i = 0; i < this.getSamples().length; i++) {
-			
+
 			log.debug("parsing sample " + (i + 1));
-			
-			IoSample sample = parseIoSample((IIntInputStream)parser);
-			
+
+			IoSample sample = parseIoSample((IIntInputStream) parser);
+
 			// attach sample to parent
 			this.getSamples()[i] = sample;
-		}		
+		}
 	}
-			
+
 	private IoSample parseIoSample(IIntInputStream parser) throws IOException {
 
 		IoSample sample = new IoSample(this);
-		
+
 		// DIO 8 occupies the first bit of the adcHeader
 		if (this.containsDigital()) {
 			// at least one DIO line is active
 			// next two bytes are DIO
-			
+
 			log.debug("Digital I/O was received");
-			
+
 			sample.setDioMsb(new Integer(parser.read("DIO MSB")));
 			sample.setDioLsb(new Integer(parser.read("DIO LSB")));
 		}
-		
+
 		// ADC is active if any of bits 2-7 are on
 		if (this.containsAnalog()) {
 			// adc is active
 			// adc is 10 bits
-			
+
 			log.debug("Analog input was received");
-			
+
 			// 10-bit values are read two bytes per sample
-			
+
 			int analog = 0;
-			
+
 			// Analog inputs A0-A5 are bits 2-7 of the adcHeader
-			
+
 			if (this.isA0Enabled()) {
-				sample.setAnalog0(new Integer(ByteUtils.parse10BitAnalog(parser, analog)));
-				analog++;				
+				sample.setAnalog0(new Integer(ByteUtils.parse10BitAnalog(
+						parser, analog)));
+				analog++;
 			}
 
 			if (this.isA1Enabled()) {
-				sample.setAnalog1(new Integer(ByteUtils.parse10BitAnalog(parser, analog)));
+				sample.setAnalog1(new Integer(ByteUtils.parse10BitAnalog(
+						parser, analog)));
 				analog++;
 			}
 
 			if (this.isA2Enabled()) {
-				sample.setAnalog2(new Integer(ByteUtils.parse10BitAnalog(parser, analog)));
+				sample.setAnalog2(new Integer(ByteUtils.parse10BitAnalog(
+						parser, analog)));
 				analog++;
 			}
 
 			if (this.isA3Enabled()) {
-				sample.setAnalog3(new Integer(ByteUtils.parse10BitAnalog(parser, analog)));
+				sample.setAnalog3(new Integer(ByteUtils.parse10BitAnalog(
+						parser, analog)));
 				analog++;
 			}
 
 			if (this.isA4Enabled()) {
-				sample.setAnalog4(new Integer(ByteUtils.parse10BitAnalog(parser, analog)));
+				sample.setAnalog4(new Integer(ByteUtils.parse10BitAnalog(
+						parser, analog)));
 				analog++;
 			}
-			
+
 			if (this.isA5Enabled()) {
-				sample.setAnalog5(new Integer(ByteUtils.parse10BitAnalog(parser, analog)));
+				sample.setAnalog5(new Integer(ByteUtils.parse10BitAnalog(
+						parser, analog)));
 				analog++;
 			}
-			
+
 			log.debug("There are " + analog + " analog inputs turned on");
 		}
-		
+
 		return sample;
 	}
-	
+
 	public IoSample[] getSamples() {
 		return samples;
 	}
@@ -166,9 +179,9 @@ public class RxResponseIoSample extends RxBaseResponse implements NoRequestRespo
 	public void setSamples(IoSample[] samples) {
 		this.samples = samples;
 	}
-	
+
 	public boolean isDigitalEnabled(int pin) {
-		if (pin >= 0 && pin <= 7) { 
+		if (pin >= 0 && pin <= 7) {
 			return ByteUtils.getBit(channelIndicator2, pin + 1);
 		} else if (pin == 8) {
 			return ByteUtils.getBit(channelIndicator1, 1);
@@ -192,35 +205,35 @@ public class RxResponseIoSample extends RxBaseResponse implements NoRequestRespo
 	public boolean isD3Enabled() {
 		return ByteUtils.getBit(channelIndicator2, 4);
 	}
-	
+
 	public boolean isD4Enabled() {
 		return ByteUtils.getBit(channelIndicator2, 5);
 	}
-	
+
 	public boolean isD5Enabled() {
 		return ByteUtils.getBit(channelIndicator2, 6);
 	}
-	
+
 	public boolean isD6Enabled() {
 		return ByteUtils.getBit(channelIndicator2, 7);
 	}
-	
+
 	public boolean isD7Enabled() {
 		return ByteUtils.getBit(channelIndicator2, 8);
-	}	
+	}
 
 	public boolean isD8Enabled() {
 		return ByteUtils.getBit(channelIndicator1, 1);
-	}	
-	
+	}
+
 	public boolean isAnalogEnabled(int pin) {
 		if (pin >= 0 && pin <= 5) {
-			return  ByteUtils.getBit(channelIndicator1, pin + 2);
+			return ByteUtils.getBit(channelIndicator1, pin + 2);
 		} else {
 			throw new IllegalArgumentException("Unsupported pin: " + pin);
 		}
 	}
-		
+
 	public boolean isA0Enabled() {
 		return ByteUtils.getBit(channelIndicator1, 2);
 	}
@@ -228,23 +241,23 @@ public class RxResponseIoSample extends RxBaseResponse implements NoRequestRespo
 	public boolean isA1Enabled() {
 		return ByteUtils.getBit(channelIndicator1, 3);
 	}
-	
+
 	public boolean isA2Enabled() {
 		return ByteUtils.getBit(channelIndicator1, 4);
 	}
-	
+
 	public boolean isA3Enabled() {
 		return ByteUtils.getBit(channelIndicator1, 5);
 	}
-	
+
 	public boolean isA4Enabled() {
 		return ByteUtils.getBit(channelIndicator1, 6);
 	}
-	
+
 	public boolean isA5Enabled() {
 		return ByteUtils.getBit(channelIndicator1, 7);
 	}
-	
+
 	public int getChannelIndicator1() {
 		return channelIndicator1;
 	}
@@ -268,7 +281,7 @@ public class RxResponseIoSample extends RxBaseResponse implements NoRequestRespo
 		// ADC is active if > 0 after channel mask is applied
 		return (this.channelIndicator1 & ADC_CHANNEL1) > 0;
 	}
-	
+
 	/**
 	 * Returns true if this packet contains at least one digital sample
 	 * 
@@ -276,21 +289,22 @@ public class RxResponseIoSample extends RxBaseResponse implements NoRequestRespo
 	 */
 	public boolean containsDigital() {
 		// DIO 8 occupies the first bit of the adcHeader
-		return (this.channelIndicator1 & DIO_CHANNEL1) > 0 || this.channelIndicator2 > 0;
+		return (this.channelIndicator1 & DIO_CHANNEL1) > 0
+				|| this.channelIndicator2 > 0;
 	}
-	
+
 	public String toString() {
-			
+
 		StringBuilder sb = new StringBuilder();
-		
+
 		sb.append(super.toString());
-		
+
 		sb.append(",#samples=" + this.samples.length);
-				
+
 		for (int i = 0; i < samples.length; i++) {
 			sb.append(",Sample#" + (i + 1) + ":" + samples[i].toString() + "]");
 		}
-		
+
 		return sb.toString();
 	}
 }

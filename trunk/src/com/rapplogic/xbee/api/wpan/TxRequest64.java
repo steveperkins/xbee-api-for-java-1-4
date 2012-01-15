@@ -26,23 +26,26 @@ import com.rapplogic.xbee.util.IntArrayOutputStream;
 // TODO test setting DH/DL to 0 and SH/SL
 
 /**
- * Series 1 XBee.  64-bit address Transmit Packet.  This is received on the destination XBee
- * radio as a RxResponse64 response
+ * Series 1 XBee. 64-bit address Transmit Packet. This is received on the
+ * destination XBee radio as a RxResponse64 response
  * <p/>
  * Constructs frame data portion of a 64-bit transmit request
  * <p/>
- * Note: The MY address of the receiving XBee must be set to 0xffff to receive this as a RxResponse64;
- * otherwise the packet will be transmitted but will be received as a RxResponse16
+ * Note: The MY address of the receiving XBee must be set to 0xffff to receive
+ * this as a RxResponse64; otherwise the packet will be transmitted but will be
+ * received as a RxResponse16
  * <p/>
  * API ID: 0x0
  * <p/>
+ * 
  * @author andrew
- *
+ * 
  */
 public class TxRequest64 extends TxRequestBase {
-	
+
+	private static final long serialVersionUID = -6585140957247475780L;
 	private XBeeAddress64 remoteAddr64;
-	
+
 	/**
 	 * 16 bit Tx Request with default frame id and awk option
 	 * 
@@ -52,14 +55,15 @@ public class TxRequest64 extends TxRequestBase {
 	public TxRequest64(XBeeAddress64 destination, int[] payload) {
 		this(destination, DEFAULT_FRAME_ID, UNICAST, payload);
 	}
-	
+
 	/**
 	 * 16 bit Tx Request.
-	 *   
-	 * Keep in mind that if you programmed the destination address with AT commands, it is in Hex,
-	 * so prepend int with 0x (e.g. 0x1234).
 	 * 
-	 * Payload size is limited to 100 bytes, according to MaxStream documentation.
+	 * Keep in mind that if you programmed the destination address with AT
+	 * commands, it is in Hex, so prepend int with 0x (e.g. 0x1234).
+	 * 
+	 * Payload size is limited to 100 bytes, according to MaxStream
+	 * documentation.
 	 * 
 	 * @param destinationAddress
 	 * @param awkFrameId
@@ -68,16 +72,18 @@ public class TxRequest64 extends TxRequestBase {
 	public TxRequest64(XBeeAddress64 destination, int frameId, int[] payload) {
 		this(destination, frameId, UNICAST, payload);
 	}
-	
+
 	/**
-	 * Note: if option is DISABLE_ACK_OPTION you will not get a ack response and you must use the asynchronous send method
+	 * Note: if option is DISABLE_ACK_OPTION you will not get a ack response and
+	 * you must use the asynchronous send method
 	 * 
 	 * @param destinationAddress
 	 * @param awkFrameId
 	 * @param payload
 	 * @param option
 	 */
-	public TxRequest64(XBeeAddress64 remoteAddr64, int frameId, String option, int[] payload) {
+	public TxRequest64(XBeeAddress64 remoteAddr64, int frameId, String option,
+			int[] payload) {
 		this.remoteAddr64 = remoteAddr64;
 		this.setFrameId(frameId);
 		this.setOption(option);
@@ -85,27 +91,28 @@ public class TxRequest64 extends TxRequestBase {
 	}
 
 	public int[] getFrameData() {
-		
-		// 3/6/10 fixed bug -- broadcast address is used with broadcast option, not no ACK
+
+		// 3/6/10 fixed bug -- broadcast address is used with broadcast option,
+		// not no ACK
 
 		IntArrayOutputStream out = new IntArrayOutputStream();
-		
+
 		// api id
 		out.write(this.getApiId().getValue().intValue());
 		// frame id (arbitrary byte that will be sent back with ack)
 		out.write(this.getFrameId());
 		// destination high (broadcast is 0xFFFF)
-		
+
 		// add 64-bit dest address
 		out.write(remoteAddr64.getAddress());
-		
+
 		// options byte disable ack = 1, send pan id = 4
-		out.write(this.getOptionValue());		
+		out.write(this.getOptionValue());
 		out.write(this.getPayload());
-		
-		return out.getIntArray();	
+
+		return out.getIntArray();
 	}
-	
+
 	public ApiId getApiId() {
 		return ApiId.TX_REQUEST_64;
 	}
@@ -117,10 +124,10 @@ public class TxRequest64 extends TxRequestBase {
 	public void setRemoteAddr64(XBeeAddress64 remoteAddr64) {
 		this.remoteAddr64 = remoteAddr64;
 	}
-	
+
 	public String toString() {
-		return super.toString() + 
-			",remoteAddress64=" + this.remoteAddr64.toString();
+		return super.toString() + ",remoteAddress64="
+				+ this.remoteAddr64.toString();
 	}
 
 }

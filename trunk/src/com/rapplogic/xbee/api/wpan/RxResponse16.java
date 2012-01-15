@@ -21,29 +21,29 @@ package com.rapplogic.xbee.api.wpan;
 
 import java.io.IOException;
 
-import com.rapplogic.xbee.api.ApiId;
 import com.rapplogic.xbee.api.IPacketParser;
 import com.rapplogic.xbee.api.NoRequestResponse;
 import com.rapplogic.xbee.api.XBeeAddress16;
 
 /**
- * Series 1 XBee. 16-bit address Receive packet.
- * This packet is received when a remote radio transmits a TxRequest16
- * packet to this radio's MY address
+ * Series 1 XBee. 16-bit address Receive packet. This packet is received when a
+ * remote radio transmits a TxRequest16 packet to this radio's MY address
  * <p/>
  * API ID: 0x81
  * 
  * @author andrew
- *
+ * 
  */
 public class RxResponse16 extends RxResponse implements NoRequestResponse {
-	
+
+	private static final long serialVersionUID = -5338806322744254242L;
+
 	public XBeeAddress16 getRemoteAddress() {
 		return (XBeeAddress16) this.getSourceAddress();
 	}
-	
+
 	public void parse(IPacketParser parser) throws IOException {
-		this.setSourceAddress(parser.parseAddress16());	
+		this.setSourceAddress(parser.parseAddress16());
 		super.parseBase(parser);
 		super.parse(parser);
 	}

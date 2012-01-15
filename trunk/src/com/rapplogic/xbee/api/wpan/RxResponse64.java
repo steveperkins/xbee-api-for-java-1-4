@@ -25,9 +25,8 @@ import com.rapplogic.xbee.api.IPacketParser;
 import com.rapplogic.xbee.api.XBeeAddress64;
 
 /**
- * Series 1 XBee. 64-bit address Receive packet.
- * This packet is received when a remote radio transmits a TxRequest64
- * packet to this radio's SH + SL address.
+ * Series 1 XBee. 64-bit address Receive packet. This packet is received when a
+ * remote radio transmits a TxRequest64 packet to this radio's SH + SL address.
  * <p/>
  * Note: MY address must be set to 0xffff to receive this packet type.
  * <p/>
@@ -36,14 +35,16 @@ import com.rapplogic.xbee.api.XBeeAddress64;
  * @author andrew
  */
 public class RxResponse64 extends RxResponse {
-	
+
+	private static final long serialVersionUID = 5482472190377241887L;
+
 	public XBeeAddress64 getRemoteAddress() {
 		return (XBeeAddress64) this.getSourceAddress();
 	}
-	
+
 	public void parse(IPacketParser parser) throws IOException {
-		this.setSourceAddress(parser.parseAddress64());	
+		this.setSourceAddress(parser.parseAddress64());
 		super.parseBase(parser);
 		super.parse(parser);
-	}	
+	}
 }

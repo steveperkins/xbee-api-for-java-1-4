@@ -31,55 +31,65 @@ import com.rapplogic.xbee.api.wpan.RxResponse64;
 import com.rapplogic.xbee.util.ByteUtils;
 
 /**
- * Receives IO samples from remote radio
- * I have a photoresistor connected to analog0 and a thermistor is connected to analog1
- * Also there is a breadboard switch connected to digital2 with change detect configured
+ * Receives IO samples from remote radio I have a photoresistor connected to
+ * analog0 and a thermistor is connected to analog1 Also there is a breadboard
+ * switch connected to digital2 with change detect configured
  * 
  * @author andrew
  * 
  */
 public class ApiReceiverExample {
 
-	private final static Logger log = Logger.getLogger(ApiReceiverExample.class);
+	private final static Logger log = Logger
+			.getLogger(ApiReceiverExample.class);
 
-	private long last = System.currentTimeMillis();
-	
+	// private long last = System.currentTimeMillis();
+
 	private ApiReceiverExample() throws Exception {
-		XBee xbee = new XBee();		
-		
+		XBee xbee = new XBee();
+
 		int count = 0;
 		int errors = 0;
 
-		try {			
-			// my end device 
+		try {
+			// my end device
 			xbee.open("/dev/tty.usbserial-A6005v5M", 9600);
 			// my coordinator
-			//xbee.open("/dev/tty.usbserial-A4004Rim", 9600);
-			
+			// xbee.open("/dev/tty.usbserial-A4004Rim", 9600);
+
 			while (true) {
 
 				try {
 					XBeeResponse response = xbee.getResponse();
 					count++;
-					
+
 					if (response.isError()) {
-						log.info("response contains errors", ((ErrorResponse)response).getException());
+						log.info("response contains errors",
+								((ErrorResponse) response).getException());
 						errors++;
 					}
 
-					for (int i = 0; i < response.getPacketBytes().length; i++) {
-						log.info("packet [" + i + "] " + ByteUtils.toBase16(response.getPacketBytes()[i]));
-					}
-					
- 					if (response.getApiId() == ApiId.RX_16_RESPONSE) {
-						log.info("Received RX 16 packet " + ((RxResponse16)response));
- 					} else if (response.getApiId() == ApiId.RX_64_RESPONSE) {
- 						log.info("Received RX 64 packet " + ((RxResponse64)response));
-					} else {
-						log.info("Ignoring mystery packet " + response.toString());
+					for (int i = 0; i < response.getRawPacketBytes().length; i++) {
+						log.info("packet ["
+								+ i
+								+ "] "
+								+ ByteUtils.toBase16(response
+										.getRawPacketBytes()[i]));
 					}
 
-					log.debug("Received response: " + response.toString() + ", count is " + count + ", errors is " + errors);
+					if (response.getApiId() == ApiId.RX_16_RESPONSE) {
+						log.info("Received RX 16 packet "
+								+ ((RxResponse16) response));
+					} else if (response.getApiId() == ApiId.RX_64_RESPONSE) {
+						log.info("Received RX 64 packet "
+								+ ((RxResponse64) response));
+					} else {
+						log.info("Ignoring mystery packet "
+								+ response.toString());
+					}
+
+					log.debug("Received response: " + response.toString()
+							+ ", count is " + count + ", errors is " + errors);
 				} catch (Exception e) {
 					log.error(e);
 				}

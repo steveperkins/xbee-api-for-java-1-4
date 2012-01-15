@@ -21,34 +21,34 @@ package com.rapplogic.xbee.api;
 
 import java.io.IOException;
 
-
 //TODO Now supported by series 1 XBee. parseIoSample now needs to handle series 1 and 2
 
 /**
- * Supported by both series 1 (10C8 firmware and later) and series 2.
- * Represents a response, corresponding to a RemoteAtRequest.
+ * Supported by both series 1 (10C8 firmware and later) and series 2. Represents
+ * a response, corresponding to a RemoteAtRequest.
  * <p/>
  * API ID: 0x97
  */
 public class RemoteAtResponse extends AtCommandResponse {
-		
+
+	private static final long serialVersionUID = -5306913680039586889L;
 	private XBeeAddress64 remoteAddress64;
 	private XBeeAddress16 remoteAddress16;
-	
+
 	public RemoteAtResponse() {
 
 	}
 
 	public boolean isSixteenBitAddressUnknown() {
-		return remoteAddress16.getMsb() == 0xff && remoteAddress16.getLsb() == 0xfe;
+		return remoteAddress16.getMsb() == 0xff
+				&& remoteAddress16.getLsb() == 0xfe;
 	}
 
 	public XBeeAddress64 getRemoteAddress64() {
 		return remoteAddress64;
 	}
 
-	public void setRemoteAddress64(
-			XBeeAddress64 sixtyFourBitResponderAddress) {
+	public void setRemoteAddress64(XBeeAddress64 sixtyFourBitResponderAddress) {
 		this.remoteAddress64 = sixtyFourBitResponderAddress;
 	}
 
@@ -56,51 +56,47 @@ public class RemoteAtResponse extends AtCommandResponse {
 		return remoteAddress16;
 	}
 
-	public void setRemoteAddress16(
-			XBeeAddress16 sixteenBitResponderAddress) {
+	public void setRemoteAddress16(XBeeAddress16 sixteenBitResponderAddress) {
 		this.remoteAddress16 = sixteenBitResponderAddress;
 	}
 
 	/**
 	 * @deprecated use getCommand instead
-	 * @return
-	 * Mar 4, 2009
+	 * @return Mar 4, 2009
 	 */
 	public String getCommandName() {
 		return super.getCommand();
 	}
-	
+
 	/**
 	 * @deprecated use getValue instead
-	 * @return
-	 * Mar 4, 2009
+	 * @return Mar 4, 2009
 	 */
 	public int[] getCommandData() {
 		return super.getValue();
 	}
-	
-	public void parse(IPacketParser parser) throws IOException {		
+
+	public void parse(IPacketParser parser) throws IOException {
 		this.setFrameId(parser.read("Remote AT Response Frame Id"));
-		
+
 		this.setRemoteAddress64(parser.parseAddress64());
-		
+
 		this.setRemoteAddress16(parser.parseAddress16());
-		
-		char cmd1 = (char)parser.read("Command char 1");
-		char cmd2 = (char)parser.read("Command char 2");
-		//this.setCommand(new String(new char[] {cmd1, cmd2}));
+
+		char cmd1 = (char) parser.read("Command char 1");
+		char cmd2 = (char) parser.read("Command char 2");
+		// this.setCommand(new String(new char[] {cmd1, cmd2}));
 		this.setChar1(cmd1);
 		this.setChar2(cmd2);
-		
+
 		int status = parser.read("AT Response Status");
 		this.setStatus(RemoteAtResponse.Status.get(new Integer(status)));
-		
-		this.setValue(parser.readRemainingBytes());		
+
+		this.setValue(parser.readRemainingBytes());
 	}
-		
+
 	public String toString() {
-		return super.toString() +
-			",remoteAddress64=" + this.remoteAddress64 +
-			",remoteAddress16=" + this.remoteAddress16;
+		return super.toString() + ",remoteAddress64=" + this.remoteAddress64
+				+ ",remoteAddress16=" + this.remoteAddress16;
 	}
 }

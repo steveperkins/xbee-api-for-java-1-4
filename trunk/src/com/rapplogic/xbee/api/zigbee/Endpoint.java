@@ -7,8 +7,8 @@ import java.util.Map;
  * Downport of the Endpoint enumeration
  * 
  * @author andrew
- * @author barciszewski@gmail.com
- * @author perkins.steve@gmail.com
+ * @author barciszewski@gmail.com Downport to Java 1.4
+ * @author perkins.steve@gmail.com Downport to Java 1.4
  * 
  */
 public class Endpoint {

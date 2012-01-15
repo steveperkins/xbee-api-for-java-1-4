@@ -26,18 +26,21 @@ import com.rapplogic.xbee.api.NoRequestResponse;
 import com.rapplogic.xbee.util.ByteUtils;
 
 /**
- * Series 2 XBee. This packet is received when
- * a remote XBee sends a ZNetTxRequest
+ * Series 2 XBee. This packet is received when a remote XBee sends a
+ * ZNetTxRequest
  * <p/>
  * API ID: 0x90
  * <p/>
+ * 
  * @author andrew
- *
+ * 
  */
-public class ZNetRxResponse extends ZNetRxBaseResponse implements NoRequestResponse {
+public class ZNetRxResponse extends ZNetRxBaseResponse implements
+		NoRequestResponse {
 
+	private static final long serialVersionUID = 4237554204665825525L;
 	private int[] data;
-	
+
 	public ZNetRxResponse() {
 		super();
 	}
@@ -49,15 +52,14 @@ public class ZNetRxResponse extends ZNetRxBaseResponse implements NoRequestRespo
 	public void setData(int[] data) {
 		this.data = data;
 	}
-	
+
 	public void parse(IPacketParser parser) throws IOException {
 		this.parseAddress(parser);
 		this.parseOption(parser);
-		this.setData(parser.readRemainingBytes());	
+		this.setData(parser.readRemainingBytes());
 	}
-			
+
 	public String toString() {
-		return super.toString() + 
-			",data=" + ByteUtils.toBase16(this.data);
+		return super.toString() + ",data=" + ByteUtils.toBase16(this.data);
 	}
 }
